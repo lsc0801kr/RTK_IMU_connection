@@ -1,0 +1,2 @@
+ntrip_ros:rtcm_msgs:ublox_f9p/ublox:ublox_f9p/ublox_gps:ublox_f9p/ublox_msgs:ublox_f9p/ublox_serialization:vectornav
+-DCATKIN_DEVEL_PREFIX=/home/autonav/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/autonav/catkin_ws/install -G Unix Makefiles
