@@ -28,6 +28,7 @@
 //==============================================================================
 
 #include "ublox_gps/node.h"
+#include "vectornav/imutest.h"
 #include <cmath>
 #include <string>
 #include <sstream>
@@ -37,7 +38,6 @@
 #include <time.h>
 
 #include <rtcm_msgs/Message.h>
-#include "ublox_gps/imutest.h"
 
 
 
@@ -865,6 +865,26 @@ void UbloxFirmware6::callbackNavVelNed(const ublox_msgs::NavVELNED& m) {
   velocity_.twist.covariance[cols * 1 + 1] = varSpeed;
   velocity_.twist.covariance[cols * 2 + 2] = varSpeed;
   velocity_.twist.covariance[cols * 3 + 3] = -1;  //  angular rate unsupported
+
+  //여기에 IMU들어가면 됨!!!
+  BinaryAsyncMessageReceived(void* userData, Packet & p, size_t index)
+
+  //Helper function to create magnetic field message
+  void fill_mag_message(
+      sensor_msgs::MagneticField & msgMag, vn::sensors::CompositeData & cd, ros::Time & time, UserData * user_data)
+  {
+      msgMag.header.stamp = time;
+      msgMag.header.frame_id = user_data->frame_id;
+
+      // Magnetic Field
+      if (cd.hasMagnetic())
+      {
+          vec3f mag = cd.magnetic();
+          msgMag.magnetic_field.x = mag[0];
+          msgMag.magnetic_field.y = mag[1];
+          msgMag.magnetic_field.z = mag[2];
+      }
+  }
 
   velocityPublisher.publish(velocity_);
   last_nav_vel_ = m;

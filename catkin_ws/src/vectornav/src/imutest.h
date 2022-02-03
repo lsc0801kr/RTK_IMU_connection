@@ -25,6 +25,7 @@
 
 #include <iostream>
 #include <cmath>
+#include "ublox_gps/subtest.h"
 
 // No need to define PI twice if we already have it included...
 //#define M_PI 3.14159265358979323846  /* M_PI */
@@ -147,7 +148,7 @@ bool optimize_serial_communication(str::string portName){
 #endif
 
 
-//Helper function to create IMU message
+//Helper function to create IMU message 이거 가져다가 쓰자
 void fill_imu_message(
     sensor_msgs::Imu &msgIMU, vn::sensors::CompositeData &cd, ros::Time &time, UserData *user_data)
 {
@@ -569,67 +570,10 @@ static ros::Time get_time_stamp(
 // Callback function to process data packet from sensor
 //
 void BinaryAsyncMessageReceived(void* userData, Packet& p, size_t index)
-{
-    // evaluate time first, to have it as close to the measurement time as possible
-    const ros::Time ros_time = ros::Time::now();
-
-    vn::sensors::CompositeData cd = vn::sensors::CompositeData::parse(p);
-    UserData *user_data = static_cast<UserData*>(userData);
-    ros::Time time = get_time_stamp(cd, user_data, ros_time);
 
     // IMU
-    if (pubIMU.getNumSubscribers() > 0)
-    {
-        sensor_msgs::Imu msgIMU;
-        fill_imu_message(msgIMU, cd, time, user_data);
-        pubIMU.publish(msgIMU);
-    }
-
-    // Magnetic Field
-    if (pubMag.getNumSubscribers() > 0)
-    {
-        sensor_msgs::MagneticField msgMag;
-        fill_mag_message(msgMag, cd, time, user_data);
-        pubMag.publish(msgMag);
-    }
-
-    // Temperature
-    if (pubTemp.getNumSubscribers() > 0)
-    {
-        sensor_msgs::Temperature msgTemp;
-        fill_temp_message(msgTemp, cd, time, user_data);
-        pubTemp.publish(msgTemp);
-    }
-
-    // Barometer
-    if (pubPres.getNumSubscribers() > 0)
-    {
-        sensor_msgs::FluidPressure msgPres;
-        fill_pres_message(msgPres, cd, time, user_data);
-        pubPres.publish(msgPres);
-    }
-
-    // GPS
-    if (user_data->device_family != VnSensor::Family::VnSensor_Family_Vn100 && pubGPS.getNumSubscribers() > 0)
-    {
-        sensor_msgs::NavSatFix msgGPS;
-        fill_gps_message(msgGPS, cd, time, user_data);
-        pubGPS.publish(msgGPS);
-    }
-
-    // Odometry
-    if (user_data->device_family != VnSensor::Family::VnSensor_Family_Vn100 && pubOdom.getNumSubscribers() > 0)
-    {
-        nav_msgs::Odometry msgOdom;
-        fill_odom_message(msgOdom, cd, time, user_data);
-        pubOdom.publish(msgOdom);
-    }
-
-    // INS
-    if (user_data->device_family != VnSensor::Family::VnSensor_Family_Vn100 && pubIns.getNumSubscribers() > 0)
-    {
-        vectornav::Ins msgINS;
-        fill_ins_message(msgINS, cd, time, user_data);
-        pubIns.publish(msgINS);
-    }
+    sensor_msgs::Imu msgIMU;
+    fill_imu_message(msgIMU, cd, time, user_data);
+    pubIMU.publish(msgIMU);
+    //여기임!!!
 }
